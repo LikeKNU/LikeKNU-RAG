@@ -9,7 +9,7 @@ faiss-cpu>=1.7.4,<1.9.0
 
 # Text processing
 tiktoken>=0.5.2,<0.8.0
-sentence-transformers>=2.2.2,<3.0.0
+sentence-transformers>=2.7.0,<3.0.0
 
 # Korean language support
 kiwipiepy>=0.15.2,<0.17.0
