@@ -1,30 +1,30 @@
-# Core RAG dependencies
-langchain==0.1.0
-langchain-openai==0.0.5
-langchain-community==0.0.10
+# Core RAG dependencies - Latest stable versions
+langchain>=0.2.0,<0.4.0
+langchain-openai>=0.1.0,<0.3.0
+langchain-community>=0.2.0,<0.4.0
 
 # Vector databases
-chromadb==0.4.22
-faiss-cpu==1.7.4
+chromadb>=0.4.22,<0.6.0
+faiss-cpu>=1.7.4,<1.9.0
 
 # Text processing
-tiktoken==0.5.2
-sentence-transformers==2.2.2
+tiktoken>=0.5.2,<0.8.0
+sentence-transformers>=2.2.2,<3.0.0
 
 # Korean language support
-kiwipiepy==0.15.2
-konlpy==0.6.0
+kiwipiepy>=0.15.2,<0.17.0
+konlpy>=0.6.0,<0.7.0
 
 # Data handling
-pandas==2.1.4
-numpy==1.24.3
+pandas>=2.1.4,<3.0.0
+numpy>=1.24.3,<2.0.0
 
 # Environment management
-python-dotenv==1.0.0
+python-dotenv>=1.0.0,<2.0.0
 
 # Web framework (for API)
-fastapi==0.104.1
-uvicorn==0.24.0
+fastapi>=0.104.1,<0.115.0
+uvicorn>=0.24.0,<0.32.0
 
 # Development tools
-jupyter==1.0.0
+jupyter>=1.0.0,<2.0.0

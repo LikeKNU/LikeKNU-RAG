@@ -46,21 +46,13 @@ class NoticeDocument:
             "notice_id": self.notice_id,
         }
 
-        return Document(
-            page_content=page_content,
-            metadata=metadata
-        )
+        return Document(page_content=page_content, metadata=metadata)
 
 
 class NoticeTextSplitter(RecursiveCharacterTextSplitter):
-    def __init__(
-            self,
-            chunk_size: int = 500,
-            chunk_overlap: int = 50,
-            **kwargs
-    ):
-        separators = ["\n\n", "\n", ".", "?", "!", " ", ""]
 
+    def __init__(self, chunk_size: int = 500, chunk_overlap: int = 50, **kwargs):
+        separators = ["\n\n", "\n", ".", "?", "!", " ", ""]
         super().__init__(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
@@ -69,24 +61,16 @@ class NoticeTextSplitter(RecursiveCharacterTextSplitter):
         )
 
 
-def get_allowed_campuses(user_campus: Campus) -> List[Campus]:
-    return [Campus.ALL, user_campus]
-
-
-def is_campus_allowed(user_campus: Campus, notice_campus: Campus) -> bool:
-    allowed_campuses = get_allowed_campuses(user_campus)
-    return notice_campus in allowed_campuses
-
-
 def filter_documents_by_campus(
         documents: List[Document],
         user_campus: Campus
 ) -> List[Document]:
+    allowed_campuses = [Campus.ALL, user_campus]
     filtered_docs = []
 
     for doc in documents:
         doc_campus = Campus(doc.metadata["campus"])
-        if is_campus_allowed(user_campus, doc_campus):
+        if doc_campus in allowed_campuses:
             filtered_docs.append(doc)
 
     return filtered_docs
