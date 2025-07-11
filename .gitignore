@@ -67,7 +67,6 @@ faiss_index/
 pinecone_index/
 
 # Model files
-models/
 *.model
 *.bin
 

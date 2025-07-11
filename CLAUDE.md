@@ -1,94 +1,144 @@
-# 공주대처럼 RAG 챗봇 개발 컨텍스트
+# Kongju University RAG Chatbot Development Context
 
-## 프로젝트 개요
-- **목표**: 공주대학교 학생들을 위한 RAG 기반 챗봇 개발
-- **제공 정보**: 공지사항, 식단메뉴, 학사일정, 셔틀버스, 동아리 정보
-- **기술 스택**: Python, LangChain, ChromaDB, KoSimCSE, FastAPI
+## Project Overview
+- **Goal**: Develop a RAG-based chatbot for Kongju University students
+- **Information Provided**: Announcements, meal menus, academic calendar, shuttle bus, club information
+- **Tech Stack**: Python, LangChain, ChromaDB, KoSimCSE, FastAPI
 
-## 현재 구현 상태
+## Current Implementation Status
 
-### ✅ 완료된 기능
-1. **데이터 모델링** (src/models.py:10-138)
-   - 공지사항 구조화
-   - 캠퍼스별 분류 (신관/천안/예산)
-   - 카테고리별 분류 (학사/장학/도서관 등)
+### ✅ Completed Features
+1. **Data Modeling** (src/models.py:10-138)
+   - Structured announcement data
+   - Campus-based classification (Singwan/Cheonan/Yesan)
+   - Category-based classification (Academic/Scholarship/Library, etc.)
 
-2. **한국어 임베딩 시스템** (src/embeddings.py:11-54)
-   - KoSimCSE-RoBERTa-multitask 모델 사용
-   - 한국어 특화 성능
+2. **Korean Embedding System** (src/embeddings.py:11-54)
+   - Uses KoSimCSE-RoBERTa-multitask model
+   - Optimized for Korean language performance
 
-3. **문서 처리 파이프라인** (src/document_loader.py:7-36)
-   - 문서 청킹 및 메타데이터 관리
-   - LangChain Document 변환
+3. **Document Processing Pipeline** (src/document_loader.py:7-36)
+   - Document chunking and metadata management
+   - LangChain Document conversion
 
-4. **ChromaDB 벡터 저장소** (src/vector_store.py:11-112)
-   - 임베디드 모드 사용 (별도 서버 불필요)
-   - 캠퍼스별 필터링 지원
-   - 유사도 검색 기능
+4. **ChromaDB Vector Store** (src/vector_store.py:11-112)
+   - Uses embedded mode (no separate server required)
+   - Campus-based filtering support
+   - Similarity search functionality
 
-5. **RAG 검색 시스템** (src/rag_system.py:12-120)
-   - OpenAI GPT 모델 연동
-   - 맥락 기반 답변 생성
-   - 소스 문서 추적
+5. **RAG Search System** (src/rag_system.py:12-120)
+   - OpenAI GPT model integration
+   - Context-based answer generation
+   - Source document tracking
 
-6. **테스트 코드**
-   - 기본 기능 테스트 (tests/test_basic.py): ✅ 통과
-   - RAG 시스템 테스트 (tests/test_rag.py): ✅ 완전 통과
+6. **Test Code**
+   - Basic functionality tests (tests/test_basic.py): ✅ Passed
+   - RAG system tests (tests/test_rag.py): ✅ Fully passed
 
-7. **완전한 RAG 시스템 구축 완료** 🎉
-   - OpenAI API 키 설정 완료
-   - 질문 → 문서 검색 → GPT 답변 생성 전체 파이프라인 정상 작동
-   - 캠퍼스별 필터링 기능 완전 동작
-   - gpt-4o-mini 모델 사용으로 성능 최적화
+7. **Complete RAG System Built** 🎉
+   - OpenAI API key setup completed
+   - Full pipeline working: Question → Document search → GPT answer generation
+   - Campus-based filtering functionality fully operational
+   - Performance optimized with gpt-4o-mini model
 
-### 🚧 진행 중/예정 사항
-- [ ] 벡터 저장소 캐싱 최적화 (매번 임베딩 재계산 문제 해결)
-- [ ] FastAPI 서버 구축
-- [ ] 실제 데이터 연동
-- [ ] CLI 인터페이스
-- [ ] 의존성 경고 해결
-- [ ] 다른 정보 타입 추가 (식단, 셔틀버스 등)
+8. **Event-based Messaging System** (src/messaging/)
+   - Redis Pub/Sub based asynchronous messaging
+   - Notice creation event (NOTICE_CREATED) support
+   - Scalable event architecture (BaseEvent, NoticeEvent)
+   - Type-safe Pydantic models
+   - Foundation for real-time data synchronization
 
-## 기술 세부사항
+### 🚧 In Progress/Planned
+- [ ] Event handler implementation (messaging system and RAG system integration)
+- [ ] Real-time vector store update system
+- [ ] FastAPI server setup
+- [ ] Real data integration (crawling server integration)
+- [ ] Redis cluster configuration (production environment)
+- [ ] CLI interface
+- [ ] Dependency warning resolution
+- [ ] Add other information types (meals, shuttle bus, etc.)
 
-### Python 환경
-- **사용 버전**: Python 3.11 (패키지 설치됨)
-- **실행 명령**: `python3.11` 사용 필요
-- **의존성**: requirements.txt에 정의
+## Technical Details
 
-### ChromaDB 설정
-- **모드**: 임베디드 모드 (프로덕션에서는 서버 모드 고려 필요)
-- **저장 위치**: `./data/chroma_db`
-- **장점**: 설정 간단, 별도 서버 불필요
-- **제약**: 확장성 제한, 단일 프로세스 접근
+### Python Environment
+- **Version Used**: Python 3.11 (packages installed)
+- **Execution Command**: Must use `python3.11`
+- **Dependencies**: Defined in requirements.txt
 
-### 테스트 실행 방법
+### ChromaDB Configuration
+- **Mode**: Embedded mode (consider server mode for production)
+- **Storage Location**: `./data/chroma_db`
+- **Advantages**: Simple setup, no separate server required
+- **Limitations**: Scalability constraints, single process access
+
+### Test Execution Method
 ```bash
-# 기본 기능 테스트
+# Basic functionality tests
 python3.11 tests/test_basic.py
 
-# RAG 시스템 테스트 (OpenAI API 키 필요)
+# RAG system tests (requires OpenAI API key)
 python3.11 tests/test_rag.py
 ```
 
-### 알려진 이슈
-1. **의존성 경고**: LangChain 버전 호환성 (기능에는 영향 없음)
-2. **토크나이저 경고**: 멀티프로세싱 관련 (기능에는 영향 없음)
-3. **성능 이슈**: 매번 문서 임베딩 재계산 (캐싱 필요)
+### Known Issues
+1. **Dependency Warnings**: LangChain version compatibility (no functional impact)
+2. **Tokenizer Warnings**: Multiprocessing related (no functional impact)
+3. **Performance Issues**: Document embedding recalculation each time (caching needed)
 
-### 최근 성과 (2025-07-02)
-- ✅ OpenAI API 키 설정으로 완전한 RAG 시스템 구축
-- ✅ 모든 테스트 통과 (벡터 검색, 캠퍼스 필터링, GPT 답변 생성)
-- ✅ 실제 사용 가능한 챗봇 완성
+### Recent Achievements (2025-07-11)
+- ✅ Complete RAG system built with OpenAI API key setup
+- ✅ All tests passed (vector search, campus filtering, GPT answer generation)
+- ✅ Functional chatbot completed
+- ✅ Event-based messaging system added (Redis Pub/Sub)
+- ✅ Scalability secured with microservices architecture foundation
 
-## 개발 방향성
-- **단계별 접근**: 작은 단위로 점진적 개발
-- **테스트 중심**: 각 기능별 테스트 코드 작성
-- **확장 가능**: 모듈화된 구조로 기능 추가 용이
+## Development Direction
+- **Incremental Approach**: Progressive development in small units
+- **Test-Driven**: Writing test code for each feature
+- **Scalable**: Modularized structure for easy feature addition
 
-## 다음 단계 후보
-1. 간단한 CLI 인터페이스 추가
-2. .env 파일 템플릿 생성
-3. 의존성 경고 해결
-4. FastAPI 서버 기본 구조 추가
-5. 데이터 모델 확장 (식단, 셔틀버스 등)
+## Next Step Candidates
+1. Event handler implementation (automatic vector store update on notice creation)
+2. Message broker and RAG system integration testing
+3. FastAPI server + messaging system integration
+4. .env file template creation (including Redis configuration)
+5. Simple CLI interface addition
+6. Dependency warning resolution
+7. Data model expansion (meals, shuttle bus, etc.)
+
+## Messaging System Usage
+
+### Event Publishing Specification (Publishing Server)
+```json
+{
+  "topic": "notices.created",
+  "payload": {
+    "event_data": {
+      "event_id": "uuid-here",
+      "event_type": "notice_created",
+      "timestamp": "2025-07-11T12:00:00Z",
+      "source_service": "notice-crawler",
+      "notice_id": "notice-12345",
+      "title": "Notice Title",
+      "content": "Notice Content",
+      "url": "https://www.kongju.ac.kr/notice/12345",
+      "campus": "CHEONAN",
+      "category": "ACADEMIC",
+      "published_date": "2025-07-11T10:00:00Z",
+      "author": "Academic Affairs Team",
+      "department": "Academic Affairs Office",
+      "attachments": ["file1.pdf"]
+    }
+  }
+}
+```
+
+### Redis Connection Configuration
+- Default URL: `redis://localhost:6379`
+- Production: Consider Redis cluster
+
+# Important Instruction Reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.

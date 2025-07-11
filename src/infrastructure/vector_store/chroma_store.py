@@ -4,8 +4,8 @@ from typing import List, Dict, Any, Optional
 from langchain.schema import Document
 from langchain_community.vectorstores import Chroma
 
-from .embeddings import KoreanEmbeddings
-from .models import Campus, filter_documents_by_campus
+from ..embedding.korean_embeddings import KoreanEmbeddings
+from ...domain.models import Campus
 
 
 class NoticeVectorStore:
@@ -25,12 +25,12 @@ class NoticeVectorStore:
 
     def add_documents(self, documents: List[Document]) -> List[str]:
         return self.vectorstore.add_documents(documents)
-    
+
     def add_documents_with_dedup(self, documents: List[Document]) -> List[str]:
         """notice_id 기반으로 중복을 방지하며 문서를 추가합니다."""
         # 기존 notice_id 목록 가져오기
         existing_notice_ids = self.get_existing_notice_ids()
-        
+
         # 중복되지 않은 문서만 필터링
         new_documents = []
         for doc in documents:
@@ -40,26 +40,26 @@ class NoticeVectorStore:
                 print(f"📄 새 문서 추가: {doc.metadata.get('title', 'Unknown')} (ID: {notice_id})")
             elif notice_id:
                 print(f"⚠️  중복 건너뜀: {doc.metadata.get('title', 'Unknown')} (ID: {notice_id})")
-        
+
         if new_documents:
             print(f"✅ {len(new_documents)}개 새 문서를 벡터 저장소에 추가")
             return self.vectorstore.add_documents(new_documents)
         else:
             print("📚 추가할 새 문서가 없습니다")
             return []
-    
+
     def get_existing_notice_ids(self) -> set:
         """기존에 저장된 notice_id 목록을 가져옵니다."""
         try:
             client = chromadb.PersistentClient(path=self.persist_directory)
             collection = client.get_collection(name=self.collection_name)
             results = collection.get(include=['metadatas'])
-            
+
             notice_ids = set()
             for metadata in results['metadatas']:
                 if metadata and 'notice_id' in metadata:
                     notice_ids.add(metadata['notice_id'])
-            
+
             return notice_ids
         except Exception:
             # 컬렉션이 없거나 오류 시 빈 세트 반환
@@ -128,6 +128,46 @@ class NoticeVectorStore:
         except Exception:
             return {"name": self.collection_name, "count": 0, "metadata": {}}
 
+    def get_documents_by_id(self, notice_id: str) -> List[Document]:
+        """특정 notice_id로 문서들을 조회합니다."""
+        try:
+            client = chromadb.PersistentClient(path=self.persist_directory)
+            collection = client.get_collection(name=self.collection_name)
+
+            results = collection.get(
+                where={"notice_id": notice_id},
+                include=['documents', 'metadatas']
+            )
+
+            documents = []
+            for i, doc in enumerate(results['documents']):
+                metadata = results['metadatas'][i] if i < len(results['metadatas']) else {}
+                documents.append(Document(page_content=doc, metadata=metadata))
+
+            return documents
+        except Exception:
+            return []
+
+    def delete_documents_by_id(self, notice_id: str) -> int:
+        """특정 notice_id로 문서들을 삭제합니다."""
+        try:
+            client = chromadb.PersistentClient(path=self.persist_directory)
+            collection = client.get_collection(name=self.collection_name)
+
+            # 먼저 해당 ID의 문서들을 찾기
+            results = collection.get(
+                where={"notice_id": notice_id},
+                include=['metadatas']
+            )
+
+            if results['ids']:
+                collection.delete(ids=results['ids'])
+                return len(results['ids'])
+
+            return 0
+        except Exception:
+            return 0
+
     def update_documents(self, documents: List[Document]) -> List[str]:
         self.delete_collection()
 
@@ -141,15 +181,15 @@ class NoticeVectorStore:
 
 
 def create_vector_store_with_sample_data() -> NoticeVectorStore:
-    from .document_loader import create_sample_langchain_documents
+    from ...application.processors.document_processor import create_sample_langchain_documents
 
     vector_store = NoticeVectorStore()
-    
+
     # notice_id 기반 중복 방지로 샘플 데이터 추가
     print("📝 샘플 데이터를 중복 검사하며 추가 중...")
     documents = create_sample_langchain_documents()
     vector_store.add_documents_with_dedup(documents)
-    
+
     # 최종 상태 확인
     final_info = vector_store.get_collection_info()
     print(f"📊 현재 총 문서 수: {final_info['count']}개")

@@ -5,8 +5,8 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
 
-from .vector_store import NoticeVectorStore
-from .models import Campus
+from ...infrastructure.vector_store.chroma_store import NoticeVectorStore
+from ...domain.models import Campus
 
 
 class NoticeRAGSystem:
@@ -100,7 +100,7 @@ class NoticeRAGSystem:
 
 
 def create_rag_system_with_sample_data() -> NoticeRAGSystem:
-    from .vector_store import create_vector_store_with_sample_data
+    from ...infrastructure.vector_store.chroma_store import create_vector_store_with_sample_data
 
     vector_store = create_vector_store_with_sample_data()
     return NoticeRAGSystem(vector_store)

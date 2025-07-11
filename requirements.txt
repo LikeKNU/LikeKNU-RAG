@@ -28,3 +28,10 @@ uvicorn>=0.24.0,<0.32.0
 
 # Development tools
 jupyter>=1.0.0,<2.0.0
+
+# Messaging system
+redis>=4.5.0,<6.0.0
+pydantic>=2.5.0,<3.0.0
+
+# Async support
+asyncio-mqtt>=0.16.0,<0.17.0  # Alternative messaging option

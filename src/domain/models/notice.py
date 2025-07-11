@@ -1,26 +1,29 @@
 from datetime import datetime
 from typing import List, Optional
-from enum import Enum
 from dataclasses import dataclass
 
 from langchain.schema import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+from .campus import Campus
+from .common import NoticeCategory, Category
 
 
-class Campus(Enum):
-    ALL = "ALL"
-    SINGWAN = "SINGWAN"
-    CHEONAN = "CHEONAN"
-    YESAN = "YESAN"
-
-
-class Category(Enum):
-    ACADEMIC = "ACADEMIC"
-    STUDENT_NEWS = "STUDENT_NEWS"
-    LIBRARY = "LIBRARY"
-    SCHOLARSHIP = "SCHOLARSHIP"
-    RECRUITMENT = "RECRUITMENT"
-    GENERAL = "GENERAL"
+@dataclass
+class Notice:
+    id: str
+    title: str
+    content: str
+    url: str
+    campus: Campus
+    category: NoticeCategory
+    published_date: datetime
+    author: Optional[str] = None
+    department: Optional[str] = None
+    attachments: List[str] = None
+    
+    def __post_init__(self):
+        if self.attachments is None:
+            self.attachments = []
 
 
 @dataclass
@@ -47,33 +50,6 @@ class NoticeDocument:
         }
 
         return Document(page_content=page_content, metadata=metadata)
-
-
-class NoticeTextSplitter(RecursiveCharacterTextSplitter):
-
-    def __init__(self, chunk_size: int = 500, chunk_overlap: int = 50, **kwargs):
-        separators = ["\n\n", "\n", ".", "?", "!", " ", ""]
-        super().__init__(
-            chunk_size=chunk_size,
-            chunk_overlap=chunk_overlap,
-            separators=separators,
-            **kwargs
-        )
-
-
-def filter_documents_by_campus(
-        documents: List[Document],
-        user_campus: Campus
-) -> List[Document]:
-    allowed_campuses = [Campus.ALL, user_campus]
-    filtered_docs = []
-
-    for doc in documents:
-        doc_campus = Campus(doc.metadata["campus"])
-        if doc_campus in allowed_campuses:
-            filtered_docs.append(doc)
-
-    return filtered_docs
 
 
 def create_sample_notices() -> List[NoticeDocument]:
